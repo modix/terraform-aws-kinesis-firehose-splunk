@@ -12,7 +12,7 @@ variable "hec_token" {
 
 variable "nodejs_runtime" {
   description = "Runtime version of nodejs for Lambda function"
-  default     = "nodejs6.10"
+  default     = "nodejs12.x"
 }
 
 variable "firehose_name" {
@@ -78,7 +78,11 @@ variable "log_stream_name" {
 
 variable "s3_bucket_name" {
   description = "Name of the s3 bucket Kinesis Firehose uses for backups"
-  default     = "kinesis-firehose-to-splunk"
+}
+
+variable "s3_bucket_block_public_access_enabled" {
+  description = "Set to 1 if you would like to add block public access settings for the s3 bucket Kinesis Firehose uses for backups"
+  default     = 0
 }
 
 variable "encryption_context" {

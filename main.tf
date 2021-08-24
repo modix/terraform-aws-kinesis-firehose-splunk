@@ -1,4 +1,4 @@
-# Kenisis firehose stream
+# Kinesis firehose stream
 # Record Transformation Required, called "processing_configuration" in Terraform
 resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
   name        = "${ var.firehose_name }"
@@ -56,7 +56,7 @@ resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
 # S3 Bucket for Kinesis Firehose s3_backup_mode
 resource "aws_s3_bucket" "kinesis_firehose_s3_bucket" {
   bucket = "${ var.s3_bucket_name }"
-  region = "${ var.region }"
+
   acl    = "private"
 
   server_side_encryption_configuration {
@@ -69,6 +69,17 @@ resource "aws_s3_bucket" "kinesis_firehose_s3_bucket" {
 
   tags = "${ var.tags }"
 }
+
+resource "aws_s3_bucket_public_access_block" "kinesis_firehose_s3_bucket" {
+  count  = "${ var.s3_bucket_block_public_access_enabled }"
+  bucket = "${ aws_s3_bucket.kinesis_firehose_s3_bucket.id }"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 
 # Cloudwatch logging group for Kinesis Firehose
 resource "aws_cloudwatch_log_group" "kinesis_logs" {
@@ -210,10 +221,10 @@ data "archive_file" "lambda_function" {
   output_path = "${ path.module }/files/kinesis-firehose-cloudwatch-logs-processor.zip"
 }
 
-# Role for Kenisis Firehose
+# Role for Kinesis Firehose
 resource "aws_iam_role" "kinesis_firehose" {
   name        = "${ var.kinesis_firehose_role_name }"
-  description = "IAM Role for Kenisis Firehose"
+  description = "IAM Role for Kinesis Firehose"
 
   assume_role_policy = <<POLICY
 {
@@ -282,7 +293,7 @@ resource "aws_iam_policy" "kinesis_firehose_iam_policy" {
   policy = "${ data.aws_iam_policy_document.kinesis_firehose_policy_document.json }"
 }
 
-resource "aws_iam_role_policy_attachment" "kenisis_fh_role_attachment" {
+resource "aws_iam_role_policy_attachment" "kinesis_fh_role_attachment" {
   role       = "${ aws_iam_role.kinesis_firehose.name }"
   policy_arn = "${ aws_iam_policy.kinesis_firehose_iam_policy.arn }"
 }

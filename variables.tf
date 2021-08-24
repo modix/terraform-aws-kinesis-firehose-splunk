@@ -106,19 +106,9 @@ variable "arns_cloudwatch_logs_to_ship" {
   type        = "list"
 }
 
-variable "arns_cloudwatch_logs_to_ship_count" {
-  description = "arn count of the CloudWatch Log Groups that you want to ship to Splunk."
-  default     = 0
-}
-
 variable "names_cloudwatch_logs_to_ship" {
   description = "names of the CloudWatch Log Group that you want to ship to Splunk."
   type        = "list"
-}
-
-variable "names_cloudwatch_logs_to_ship_count" {
-  description = "names count of the CloudWatch Log Group that you want to ship to Splunk."
-  default     = 0
 }
 
 variable "lambda_function_name" {

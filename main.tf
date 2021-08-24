@@ -353,7 +353,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_to_fh" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_log_filter" {
-  count = "${var.names_cloudwatch_logs_to_ship_count}"
+  count = "${length(compact(concat(var.names_cloudwatch_logs_to_ship, list(""))))}"
 
   name            = "${ var.cloudwatch_log_filter_name }"
   role_arn        = "${ aws_iam_role.cloudwatch_to_firehose_trust.arn }"

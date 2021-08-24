@@ -15,8 +15,8 @@ You will use a KMS key of your choice to encrypt the token, as it is sensitive. 
 module "kinesis_firehose" {
   source = "disney/kinesis-firehose-splunk/aws"
   aws_region = "us-east-1"
-  arn_cloudwatch_logs_to_ship = "arn:aws:logs:us-east-1:<aws_account_number>:log-group:/test/test01:*"
-  name_cloudwatch_logs_to_ship = "/test/test01"
+  arns_cloudwatch_logs_to_ship = ["arn:aws:logs:us-east-1:<aws_account_number>:log-group:/test/test01:*"]
+  names_cloudwatch_logs_to_ship = "/test/test01"
   hec_token = "<KMS_encrypted_token>"
   kms_key_arn = "arn:aws:kms:us-east-1:<aws_account_number:key/<kms_key_id>"
   hec_url = "<Splunk_Kinesis_ingest_URL>"
@@ -30,8 +30,8 @@ module "kinesis_firehose" {
 | Variable Name | Description | Type  | Default | Required |
 |---------------|-------------|-------|---------|----------|
 | region | The region of AWS you want to work in, such as us-west-2 or us-east-1 | string | - | yes |
-| arn_cloudwatch_logs_to_ship | arn of the CloudWatch Log Group that you want to ship to Splunk. | string | - | yes |
-| name_cloudwatch_logs_to_ship | name of the CloudWatch Log Group that you want to ship to Splunk. | string | - | yes |
+| arns_cloudwatch_logs_to_ship | arns of the CloudWatch Log Group that you want to ship to Splunk. | list | - | yes |
+| names_cloudwatch_logs_to_ship | names of the CloudWatch Log Groups that you want to ship to Splunk. | list | - | yes |
 | hec_token | Splunk security token needed to submit data to Splunk vai HEC URL. Encyrpted with [this](https://www.terraform.io/docs/providers/aws/d/kms_secrets.html#example-usage) procedure using a KMS key of your choice. If encrypted with specific encryption_context please set that variable. | string | - | yes |
 | kms_key_arn | arn of the KMS key you used to encrypt the hec_token | string | - | yes |
 | encryption_context | aws_kms_secrets encryption context | map | `{}` | no |

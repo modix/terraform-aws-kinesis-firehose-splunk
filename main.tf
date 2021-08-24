@@ -57,7 +57,7 @@ resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
 resource "aws_s3_bucket" "kinesis_firehose_s3_bucket" {
   bucket = "${ var.s3_bucket_name }"
 
-  acl    = "private"
+  acl = "private"
 
   server_side_encryption_configuration {
     rule {
@@ -79,7 +79,6 @@ resource "aws_s3_bucket_public_access_block" "kinesis_firehose_s3_bucket" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-
 
 # Cloudwatch logging group for Kinesis Firehose
 resource "aws_cloudwatch_log_group" "kinesis_logs" {
@@ -134,9 +133,7 @@ data "aws_iam_policy_document" "lambda_policy_doc" {
       "logs:GetLogEvents",
     ]
 
-    resources = [
-      "${ var.arn_cloudwatch_logs_to_ship }",
-    ]
+    resources = "${ var.arns_cloudwatch_logs_to_ship }"
 
     effect = "Allow"
   }
@@ -356,9 +353,11 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_to_fh" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_log_filter" {
+  count = "${length(var.names_cloudwatch_logs_to_ship)}"
+
   name            = "${ var.cloudwatch_log_filter_name }"
   role_arn        = "${ aws_iam_role.cloudwatch_to_firehose_trust.arn }"
   destination_arn = "${ aws_kinesis_firehose_delivery_stream.kinesis_firehose.arn }"
-  log_group_name  = "${ var.name_cloudwatch_logs_to_ship }"
+  log_group_name  = "${ var.names_cloudwatch_logs_to_ship[count.index] }"
   filter_pattern  = "${ var.subscription_filter_pattern }"
 }

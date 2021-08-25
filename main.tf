@@ -153,7 +153,7 @@ data "aws_iam_policy_document" "lambda_policy_doc" {
       "logs:GetLogEvents",
     ]
 
-    resources = [ "${ var.arns_cloudwatch_logs_to_ship }" ]
+    resources = ["${ var.arns_cloudwatch_logs_to_ship }"]
 
     effect = "Allow"
   }

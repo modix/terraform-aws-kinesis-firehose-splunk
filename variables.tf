@@ -1,4 +1,3 @@
-
 variable "arns_cloudwatch_logs_to_ship" {
   description = "arns of the CloudWatch Log Groups that you want to ship to Splunk."
   type        = "list"

@@ -1,7 +1,5 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
-## 0.3.1
-  * Fixes array handling for multiple ARNs
 ## 0.3.0
   * Adds functionality to passthrough ARNs and names of CloudWatch LogGroups as an array in order to allow iteration
 

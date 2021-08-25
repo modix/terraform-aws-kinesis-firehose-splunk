@@ -67,6 +67,26 @@ resource "aws_s3_bucket" "kinesis_firehose_s3_bucket" {
     }
   }
 
+  versioning {
+    enabled = "${ var.s3_backup_retention_in_days > 0 }"
+  }
+
+  lifecycle_rule {
+    enabled = "${ var.s3_backup_retention_in_days > 0 }"
+    id      = "expire previous versions"
+
+    expiration {
+      expired_object_delete_marker = true
+    }
+
+    noncurrent_version_expiration {
+      // 0 is not required so we need a value above 0 here and for additional
+      // security we use a rather big number. Nontheless we have the main
+      // switch with the enabled flag above!
+      days = "${ var.s3_backup_retention_in_days > 0 ? var.s3_backup_retention_in_days : 99999 }"
+    }
+  }
+
   tags = "${ var.tags }"
 }
 
@@ -202,7 +222,7 @@ resource "aws_lambda_function" "firehose_lambda_transform" {
   description      = "Transform data from CloudWatch format to Splunk compatible format"
   filename         = "${ data.archive_file.lambda_function.output_path }"
   role             = "${ aws_iam_role.kinesis_firehose_lambda.arn }"
-  handler          = "kinesis-firehose-cloudwatch-logs-processor.handler"
+  handler          = "${ var.kinesis_firehose_logs_processor }.handler"
   source_code_hash = "${ data.archive_file.lambda_function.output_base64sha256 }"
   runtime          = "${ var.nodejs_runtime }"
   timeout          = "${ var.lambda_function_timeout }"
@@ -214,8 +234,8 @@ resource "aws_lambda_function" "firehose_lambda_transform" {
 # code supplied to AWS by Splunk.
 data "archive_file" "lambda_function" {
   type        = "zip"
-  source_file = "${ path.module }/files/kinesis-firehose-cloudwatch-logs-processor.js"
-  output_path = "${ path.module }/files/kinesis-firehose-cloudwatch-logs-processor.zip"
+  source_file = "${ path.module }/files/${ var.kinesis_firehose_logs_processor }.js"
+  output_path = "${ path.module }/files/${ var.kinesis_firehose_logs_processor }.zip"
 }
 
 # Role for Kinesis Firehose

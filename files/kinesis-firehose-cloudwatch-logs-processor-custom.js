@@ -64,18 +64,24 @@ const AWS = require('aws-sdk');
  */
 function transformLogEvent(logEvent, data) {
   const { owner, logGroup, logStream } = data;
-  var metadata = { aws_account_id: owner, log_group: logGroup, log_stream: logStream };
-    var json = '';
-    var event = {
-        time: logEvent.timestamp,
-        event: logEvent.message,
-        sourcetype: "mdx:aws:cloudwatchlogs:lambda",
-        source: "aws_firehose",
-        fields: metadata
-    };
-
-    json = JSON.stringify(event);
-    return Promise.resolve(json);
+  var str = logEvent.message;
+  var info = str.match(/(?:,|\n|^)(['"](?:(?:(''|""))*[^'"]*)*['"]|[^'",\n]*|(?:\n|$))/g);
+  const logObj = JSON.stringify({
+	timestamp: info[0],
+	serverhost: info[1],
+	username: info[2],
+	hostname: info[3],
+	connectionid: info[4],
+	queryid: info[5],
+	operation: info[6],
+	database: info[7],
+	object: info[8],
+	retcode: info[9],
+	owner,
+	logGroup,
+	logStream
+      });
+  return Promise.resolve(`${logObj}\n`);
 }
 
 function putRecordsToFirehoseStream(streamName, records, client, resolve, reject, attemptsMade, maxAttempts) {

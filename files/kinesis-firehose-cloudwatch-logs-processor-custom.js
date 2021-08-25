@@ -69,7 +69,7 @@ function transformLogEvent(logEvent, data) {
     var event = {
         time: logEvent.timestamp,
         event: logEvent.message,
-        sourcetype: "aws:cloudwatchlogs:lambda",
+        sourcetype: "mdx:aws:cloudwatchlogs:lambda",
         source: "aws_firehose",
         fields: metadata
     };

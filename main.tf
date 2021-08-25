@@ -102,7 +102,7 @@ resource "aws_s3_bucket_public_access_block" "kinesis_firehose_s3_bucket" {
 
 # Cloudwatch logging group for Kinesis Firehose
 resource "aws_cloudwatch_log_group" "kinesis_logs" {
-  name              = "/aws/kinesisfirehose/${var.firehose_name}"
+  name              = "/aws/kinesisfirehose/${ var.firehose_name }"
   retention_in_days = "${ var.cloudwatch_log_retention }"
 
   tags = "${ var.tags }"

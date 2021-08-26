@@ -235,7 +235,7 @@ resource "aws_lambda_function" "firehose_lambda_transform" {
 data "archive_file" "lambda_function" {
   type        = "zip"
   source_file = "${ path.module }/files/${ var.kinesis_firehose_logs_processor }.js"
-  output_path = "${ path.module }/files/${ var.kinesis_firehose_logs_processor }.zip"
+  output_path = "${ path.module }/.terraform/archive_files/${ var.kinesis_firehose_logs_processor }.zip"
 }
 
 # Role for Kinesis Firehose

@@ -84,27 +84,34 @@ const AWS = require('aws-sdk');
  *
  * The result must be returned in a Promise.
  */
-function transformLogEvent(logEvent, data) {
-  const { owner, logGroup, logStream } = data;
-  var str = logEvent.message;
-  var info = str.match(/(?<=,)(?=,)|(?:(?:(?=['"])(?:['"]+([^'"]+)(?:['"]+))))|([^,]+)/g);
-  const logObj = JSON.stringify({
-	timestamp: info[0],
-	serverhost: info[1],
-	username: info[2],
-	hostname: info[3],
-	connectionid: info[4],
-	queryid: info[5],
-	operation: info[6],
-	database: info[7],
-	object: info[8],
-	retcode: info[9],
-	owner,
-	logGroup,
-	logStream
-      });
-  return Promise.resolve(`${logObj}\n`);
-}
+ function transformLogEvent(logEvent, data) {
+	const { owner, logGroup, logStream } = data;
+	var str = logEvent.message;
+	var info = str.match(/(?<=,)(?=,)|(?:(?:(?=['"])(?:['"]+([^'"]+)(?:['"]+))))|([^,]+)/g);
+	var time = info[0].match(/(\d{4})(\d{2})(\d{2})\s*(\d{2}):(\d{2}):(\d{2})/);
+	// month is indexed on 0. don't ask
+	const timeObj = new Date(time[1], time[2]-1, time[3], time[4], time[5], time[6]);
+	// getTime outputs milliseconds but timestamp needs to be in microseconds
+	const logObj = JSON.stringify({
+	      timestamp: timeObj.getTime()*1000,
+	      serverhost: info[1],
+	      username: info[2],
+	      hostname: info[3],
+	      connectionid: info[4],
+	      queryid: info[5],
+	      operation: info[6],
+	      database: info[7],
+	      object: info[8],
+	      retcode: info[9],
+	      owner,
+	      logGroup,
+	      logStream
+	    });
+	// Debugging option
+	// console.log("JSON\n" + logObj);
+	// console.info("JSON\n" + logObj);
+	return Promise.resolve(`${logObj}\n`);
+      }
 
 function putRecordsToFirehoseStream(streamName, records, client, resolve, reject, attemptsMade, maxAttempts) {
     client.putRecordBatch({

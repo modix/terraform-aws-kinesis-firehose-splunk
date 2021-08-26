@@ -65,7 +65,7 @@ const AWS = require('aws-sdk');
 function transformLogEvent(logEvent, data) {
   const { owner, logGroup, logStream } = data;
   var str = logEvent.message;
-  var info = str.match(/(?:,|\n|^)(['"](?:(?:(''|""))*[^'"]*)*['"]|[^'",\n]*|(?:\n|$))/g);
+  var info = str.match(/(?<=,)(?=,)|(?:(?:(?=['"])(?:['"]+([^'"]+)(?:['"]+))))|([^,]+)/g);
   const logObj = JSON.stringify({
 	timestamp: info[0],
 	serverhost: info[1],

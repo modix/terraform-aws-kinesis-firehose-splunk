@@ -1,3 +1,16 @@
+// Copyright 2014, Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License").
+// You may not use this file except in compliance with the License.
+// A copy of the License is located at
+//
+//  http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed
+// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+// express or implied. See the License for the specific language governing
+// permissions and limitations under the License.
+
 /*
 For processing data sent to Firehose by Cloudwatch Logs subscription filters.
 
@@ -28,6 +41,12 @@ Cloudwatch Logs sends to Firehose records that look like this:
 
 The data is additionally compressed with GZIP.
 
+NOTE: It is suggested to test the cloudwatch logs processor lambda function in a pre-production environment to ensure
+the 6000000 limit meets your requirements. If your data contains a sizable number of records that are classified as
+Dropped/ProcessingFailed, then it is suggested to lower the 6000000 limit within the function to a smaller value
+(eg: 5000000) in order to confine to the 6MB (6291456 bytes) payload limit imposed by lambda. You can find Lambda
+quotas at https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
+
 The code below will:
 
 1) Gunzip the data
@@ -41,7 +60,13 @@ The code below will:
 5) Concatenate the result from (4) together and set the result as the data of the record returned to Firehose. Note that
    this step will not add any delimiters. Delimiters should be appended by the logic within the transformLogEvent
    method.
-6) Any additional records which exceed 6MB will be re-ingested back into Firehose.
+6) Any individual record exceeding 6,000,000 bytes in size after decompression and encoding is marked as
+   ProcessingFailed within the function. The original compressed record will be backed up to the S3 bucket
+   configured on the Firehose.
+7) Any additional records which exceed 6MB will be re-ingested back into Firehose.
+8) The retry count for intermittent failures during re-ingestion is set 20 attempts. If you wish to retry fewer number
+   of times for intermittent failures you can lower this value.
+
 */
 const zlib = require('zlib');
 const AWS = require('aws-sdk');
@@ -59,6 +84,7 @@ const AWS = require('aws-sdk');
  *
  * The result must be returned in a Promise.
  */
+
 function transformLogEvent(logEvent) {
     return Promise.resolve(`${logEvent.message}\n`);
 }
@@ -188,11 +214,18 @@ exports.handler = (event, context, callback) => {
                 .then(transformed => {
                     const payload = transformed.reduce((a, v) => a + v, '');
                     const encoded = Buffer.from(payload).toString('base64');
-                    return {
-                        recordId: r.recordId,
-                        result: 'Ok',
-                        data: encoded,
-                    };
+                    if (encoded.length <= 6000000) {
+                        return {
+                            recordId: r.recordId,
+                            result: 'Ok',
+                            data: encoded,
+                        };
+                    } else {
+                        return {
+                            recordId: r.recordId,
+                            result: 'ProcessingFailed',
+                        };
+                    }
                 });
         } else {
             return Promise.resolve({
@@ -216,6 +249,7 @@ exports.handler = (event, context, callback) => {
                               .map(r => r.recordId.length + r.data.length)
                               .reduce((a, b) => a + b, 0);
         // 6000000 instead of 6291456 to leave ample headroom for the stuff we didn't account for
+
         for (let idx = 0; idx < event.records.length && projectedSize > 6000000; idx++) {
             const rec = result.records[idx];
             if (rec.result === 'Ok') {

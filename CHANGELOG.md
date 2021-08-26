@@ -1,5 +1,9 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
+## 0.4.0
+  * Adds MySQL log processor that is compatible with MySQL Community Edition and MariaDB Audit Plugin for RDS
+  * 
+
 ## 0.3.0
   * Adds functionality to passthrough ARNs and names of CloudWatch LogGroups as an array in order to allow iteration
 

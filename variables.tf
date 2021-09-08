@@ -3,6 +3,11 @@ variable "arns_cloudwatch_logs_to_ship" {
   type        = "list"
 }
 
+variable "aws_domain" {
+  description = "AWS domain used and attached to the endpoints. China needs amazonaws.com.cn for example."
+  default     = "amazonaws.com"
+}
+
 variable "cloudwatch_log_filter_name" {
   description = "Name of Log Filter for CloudWatch Log subscription to Kinesis Firehose"
   default     = "KinesisSubscriptionFilter"

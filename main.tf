@@ -249,7 +249,7 @@ resource "aws_iam_role" "kinesis_firehose" {
   "Statement": [
     {
       "Principal": {
-        "Service": "firehose.amazonaws.com"
+        "Service": "firehose.${ var.aws_domain }"
       },
       "Action": "sts:AssumeRole",
       "Effect": "Allow"

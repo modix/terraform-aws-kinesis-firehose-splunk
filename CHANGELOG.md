@@ -1,5 +1,8 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
+## 0.5.0
+  * Adds logprocessor for mysql aurora database engine
+
 ## 0.4.1
   * Adds aws_domain variable to passthrough the AWS specific domain (difference between China and non-China environments)
 

@@ -136,7 +136,7 @@ resource "aws_iam_role" "kinesis_firehose_lambda" {
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "lambda.amazonaws.com"
+        "Service": "lambda.${ var.aws_domain }"
       }
     }
   ],
@@ -249,7 +249,7 @@ resource "aws_iam_role" "kinesis_firehose" {
   "Statement": [
     {
       "Principal": {
-        "Service": "firehose.amazonaws.com"
+        "Service": "firehose.${ var.aws_domain }"
       },
       "Action": "sts:AssumeRole",
       "Effect": "Allow"
@@ -326,7 +326,7 @@ resource "aws_iam_role" "cloudwatch_to_firehose_trust" {
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "logs.${var.region}.amazonaws.com"
+        "Service": "logs.${ var.region }.${ var.aws_domain }"
       }
     }
   ],

@@ -39,6 +39,7 @@ By customising the `function transformLogEven()` you can manipulate the data whi
 | Variable Name | Description | Type  | Default | Required |
 |---------------|-------------|-------|---------|----------|
 | region | The region of AWS you want to work in, such as us-west-2 or us-east-1 | string | - | yes |
+| aws_domain | AWS domain used and attached to the endpoints. China needs amazonaws.com.cn for example. | string | amazonaws.com | yes |
 | arns_cloudwatch_logs_to_ship | arns of the CloudWatch Log Group that you want to ship to Splunk. | list | - | yes |
 | names_cloudwatch_logs_to_ship | names of the CloudWatch Log Groups that you want to ship to Splunk. | list | - | yes |
 | hec_token | Splunk security token needed to submit data to Splunk vai HEC URL. Encyrpted with [this](https://www.terraform.io/docs/providers/aws/d/kms_secrets.html#example-usage) procedure using a KMS key of your choice. If encrypted with specific encryption_context please set that variable. | string | - | yes |

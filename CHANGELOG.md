@@ -1,5 +1,7 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
+## 0.5.1
+  * fixes faulty China principals
 ## 0.5.0
   * Adds logprocessor for mysql aurora database engine
 

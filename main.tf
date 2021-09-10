@@ -136,7 +136,7 @@ resource "aws_iam_role" "kinesis_firehose_lambda" {
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "lambda.${ var.aws_domain }"
+        "Service": "lambda.amazonaws.com"
       }
     }
   ],
@@ -249,7 +249,7 @@ resource "aws_iam_role" "kinesis_firehose" {
   "Statement": [
     {
       "Principal": {
-        "Service": "firehose.${ var.aws_domain }"
+        "Service": "firehose.amazonaws.com"
       },
       "Action": "sts:AssumeRole",
       "Effect": "Allow"

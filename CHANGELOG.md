@@ -1,5 +1,11 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
+## 0.5.3
+  * Adds fix to logprocessor regarding invalid if else statement
+  
+## 0.5.2
+  * Adds switch case for epic and numerical timestamps and do a transformation if needed
+
 ## 0.5.1
   * fixes faulty China principals
 ## 0.5.0

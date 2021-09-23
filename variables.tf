@@ -89,7 +89,7 @@ variable "kinesis_firehose_role_name" {
 
 variable "kinesis_firehose_logs_processor" {
   description = "The Kinesis Firehose Logs Processors basename (without file extension) from one of which are available within the files directory"
-  default     = "kinesis-firehose-cloudwatch-logs-processor"
+  default     = "kinesis-firehose-cloudwatch-logs-processor-mysql"
 }
 
 variable "kms_key_arn" {

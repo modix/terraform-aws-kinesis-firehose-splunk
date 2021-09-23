@@ -89,15 +89,20 @@ function transformLogEvent(logEvent, data) {
     var str = logEvent.message;
     // splits incoming string by comma, adds null value for empty fields and removes quotation marks which could be surrounding fields
     var info = str.match(/(?<=,)(?=,)|(?:(?:(?=['"])(?:['"]+([^'"]+)(?:['"]+))))|([^,]+)/g);
-    // parse MySQL timestamp which is not compliant to standard datetime formats:
+    var timestamp = info[0];
+    var time;
+    // parse MySQL timestamp which is not compliant to standard datetime formats if match triggers:
     // 20210826 16:32:30
-    var time = info[0].match(/(\d{4})(\d{2})(\d{2})\s*(\d{2}):(\d{2}):(\d{2})/);
-    // month is indexed on 0 and ranges from 0 (January) to 11 (December)
-    const timeObj = new Date(time[1], time[2]-1, time[3], time[4], time[5], time[6]);
-    // getTime outputs milliseconds but timestamp needs to be in microseconds and formatted as a string to match Splunks newline break RegEx:
-    // ([\r\n]+)\{"timestamp":"\d{16}
+    if (time = timestamp.match(/(\d{4})(\d{2})(\d{2})\s*(\d{2}):(\d{2}):(\d{2})/)) {
+        // month is indexed on 0 and ranges from 0 (January) to 11 (December)
+        const timeObj = new Date(time[1], time[2]-1, time[3], time[4], time[5], time[6]);
+        // getTime outputs milliseconds but timestamp needs to be in microseconds and formatted as a string to match Splunks newline break RegEx:
+        // ([\r\n]+)\{"timestamp":"\d{16}
+	timestamp = (timeObj.getTime()*1000).toString();
+    }
+
     const logObj = JSON.stringify({
-	timestamp: (timeObj.getTime()*1000).toString(),
+	timestamp: timestamp,
 	serverhost: info[1],
 	username: info[2],
 	hostname: info[3],

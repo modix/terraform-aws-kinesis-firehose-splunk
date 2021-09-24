@@ -126,6 +126,11 @@ variable "names_cloudwatch_logs_to_ship" {
   type        = "list"
 }
 
+variable "module_count" {
+  description = "enables or deactivates the whole module at resource/data level"
+  default     = 1
+}
+
 variable "nodejs_runtime" {
   description = "Runtime version of nodejs for Lambda function"
   default     = "nodejs12.x"

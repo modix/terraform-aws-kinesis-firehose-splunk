@@ -53,6 +53,7 @@ By customising the `function transformLogEven()` you can manipulate the data whi
 | kinesis_firehose_buffer_interval | Buffer incoming data for the specified period of time, in seconds, before delivering it to the destination | integer | `300` | no |
 
 | kinesis_firehose_logs_processor | The Kinesis Firehose Logs Processors basename (without file extension) from one of which are available within the files directory | string | `kinesis-firehose-cloudwatch-logs-processor-mysql` | no |
+| module_count | enables or deactivates the whole module at resource/data level | integer | `1` | no |
 | s3_prefix | Optional prefix (a slash after the prefix will show up as a folder in the s3 bucket).  The "YYYY/MM/DD/HH" time format prefix is automatically used for delivered S3 files. | string | `kinesis-firehose/` | no |
 | hec_acknowledgment_timeout | The amount of time, in seconds between 180 and 600, that Kinesis Firehose waits to receive an acknowledgment from Splunk after it sends it data. | integer | `300` | no |
 | s3_backup_mode | Defines how documents should be delivered to Amazon S3. Valid values are `FailedEventsOnly` and `AllEvents`. | string | `FailedEventsOnly` | no |

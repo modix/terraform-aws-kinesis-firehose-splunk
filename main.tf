@@ -1,7 +1,7 @@
 # Kinesis firehose stream
 # Record Transformation Required, called "processing_configuration" in Terraform
 resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name        = "${ var.firehose_name }"
   destination = "splunk"
@@ -57,7 +57,7 @@ resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
 
 # S3 Bucket for Kinesis Firehose s3_backup_mode
 resource "aws_s3_bucket" "kinesis_firehose_s3_bucket" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   bucket = "${ var.s3_bucket_name }"
 
@@ -95,7 +95,7 @@ resource "aws_s3_bucket" "kinesis_firehose_s3_bucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "kinesis_firehose_s3_bucket" {
-  count  = "${ var.module_count > 0 ? var.s3_bucket_block_public_access_enabled : 0 }"
+  count  = "${ min(1, var.module_count) > 0 ? var.s3_bucket_block_public_access_enabled : 0 }"
   bucket = "${ aws_s3_bucket.kinesis_firehose_s3_bucket.id }"
 
   block_public_acls       = true
@@ -106,7 +106,7 @@ resource "aws_s3_bucket_public_access_block" "kinesis_firehose_s3_bucket" {
 
 # Cloudwatch logging group for Kinesis Firehose
 resource "aws_cloudwatch_log_group" "kinesis_logs" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name              = "/aws/kinesisfirehose/${ var.firehose_name }"
   retention_in_days = "${ var.cloudwatch_log_retention }"
@@ -116,7 +116,7 @@ resource "aws_cloudwatch_log_group" "kinesis_logs" {
 
 # Create the stream
 resource "aws_cloudwatch_log_stream" "kinesis_logs" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name           = "${ var.log_stream_name }"
   log_group_name = "${ aws_cloudwatch_log_group.kinesis_logs.name }"
@@ -124,7 +124,7 @@ resource "aws_cloudwatch_log_stream" "kinesis_logs" {
 
 # handle the sensitivity of the hec_token variable
 data "aws_kms_secrets" "splunk_hec_token" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   secret {
     name    = "hec_token"
@@ -136,7 +136,7 @@ data "aws_kms_secrets" "splunk_hec_token" {
 
 # Role for the transformation Lambda function attached to the kinesis stream
 resource "aws_iam_role" "kinesis_firehose_lambda" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name        = "${ var.kinesis_firehose_lambda_role_name }"
   description = "Role for Lambda function to transformation CloudWatch logs into Splunk compatible format"
@@ -160,7 +160,7 @@ POLICY
 }
 
 data "aws_iam_policy_document" "lambda_policy_doc" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   statement {
     actions = [
@@ -220,14 +220,14 @@ data "aws_iam_policy_document" "lambda_policy_doc" {
 }
 
 resource "aws_iam_policy" "lambda_transform_policy" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name   = "${ var.lambda_iam_policy_name }"
   policy = "${ data.aws_iam_policy_document.lambda_policy_doc.json }"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_role_attachment" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   role       = "${ aws_iam_role.kinesis_firehose_lambda.name }"
   policy_arn = "${ aws_iam_policy.lambda_transform_policy.arn }"
@@ -236,7 +236,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_role_attachment" {
 # Create the lambda function
 # The lambda function to transform data from compressed format in Cloudwatch to something Splunk can handle (uncompressed)
 resource "aws_lambda_function" "firehose_lambda_transform" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   function_name    = "${ var.lambda_function_name }"
   description      = "Transform data from CloudWatch format to Splunk compatible format"
@@ -254,7 +254,7 @@ resource "aws_lambda_function" "firehose_lambda_transform" {
 # kinesis-firehose-cloudwatch-logs-processor.js was taken by copy/paste from the AWS UI.  It is predefined blueprint
 # code supplied to AWS by Splunk.
 data "archive_file" "lambda_function" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   type        = "zip"
   source_file = "${ path.module }/files/${ var.kinesis_firehose_logs_processor }.js"
@@ -263,7 +263,7 @@ data "archive_file" "lambda_function" {
 
 # Role for Kinesis Firehose
 resource "aws_iam_role" "kinesis_firehose" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name        = "${ var.kinesis_firehose_role_name }"
   description = "IAM Role for Kinesis Firehose"
@@ -287,7 +287,7 @@ POLICY
 }
 
 data "aws_iam_policy_document" "kinesis_firehose_policy_document" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   statement {
     actions = [
@@ -333,21 +333,21 @@ data "aws_iam_policy_document" "kinesis_firehose_policy_document" {
 }
 
 resource "aws_iam_policy" "kinesis_firehose_iam_policy" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name   = "${ var.kinesis_firehose_iam_policy_name }"
   policy = "${ data.aws_iam_policy_document.kinesis_firehose_policy_document.json }"
 }
 
 resource "aws_iam_role_policy_attachment" "kinesis_fh_role_attachment" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   role       = "${ aws_iam_role.kinesis_firehose.name }"
   policy_arn = "${ aws_iam_policy.kinesis_firehose_iam_policy.arn }"
 }
 
 resource "aws_iam_role" "cloudwatch_to_firehose_trust" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name        = "${ var.cloudwatch_to_firehose_trust_iam_role_name }"
   description = "Role for CloudWatch Log Group subscription"
@@ -369,7 +369,7 @@ ROLE
 }
 
 data "aws_iam_policy_document" "cloudwatch_to_fh_access_policy" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   statement {
     actions = [
@@ -397,7 +397,7 @@ data "aws_iam_policy_document" "cloudwatch_to_fh_access_policy" {
 }
 
 resource "aws_iam_policy" "cloudwatch_to_fh_access_policy" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   name        = "${ var.cloudwatch_to_fh_access_policy_name }"
   description = "Cloudwatch to Firehose Subscription Policy"
@@ -405,14 +405,14 @@ resource "aws_iam_policy" "cloudwatch_to_fh_access_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch_to_fh" {
-  count = "${ var.module_count }"
+  count = "${ min(1, var.module_count) }"
 
   role       = "${ aws_iam_role.cloudwatch_to_firehose_trust.name }"
   policy_arn = "${ aws_iam_policy.cloudwatch_to_fh_access_policy.arn }"
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_log_filter" {
-  count = "${ var.module_count > 0 ? length(compact(concat(var.names_cloudwatch_logs_to_ship, list("")))) : 0 }"
+  count = "${ min(1, var.module_count) > 0 ? length(compact(concat(var.names_cloudwatch_logs_to_ship, list("")))) : 0 }"
 
   name            = "${ var.cloudwatch_log_filter_name }"
   role_arn        = "${ aws_iam_role.cloudwatch_to_firehose_trust.arn }"

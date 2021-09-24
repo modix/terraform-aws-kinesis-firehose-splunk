@@ -1,5 +1,8 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
+## 0.6.2
+  * additional optimisation for module activation
+
 ## 0.6.1
   * fixes output issue
 

@@ -65,7 +65,8 @@ By customising the `function transformLogEven()` you can manipulate the data whi
 | s3_compression_format | The compression format for what the Kinesis Firehose puts in the s3 bucket | string | `GZIP` | no |
 | kinesis_firehose_lambda_role_name | Name of IAM Role for Lambda function that transforms CloudWatch data for Kinesis Firehose into Splunk compatible format | string | `KinesisFirehoseToLambaRole` | no |
 | lambda_iam_policy_name | Name of the IAM policy that is attached to the IAM Role for the lambda transform function | string | `Kinesis-Firehose-to-Splunk-Policy` | no |
-| lambda_function_timeout | The function execution time at which Lambda should terminate the function. | integer | `180` | no |
+| lambda_function_timeout | The memory limit in MB which can be the max for a single function. | integer | `128` | no |
+| lambda_function_memory_limit_in_mb | The function execution time at which Lambda should terminate the function. | integer | `180` | no |
 | kinesis_firehose_iam_policy_name | Name of the IAM Policy attached to IAM Role for the Kinesis Firehose | string | `KinesisFirehose-Policy` | no |
 | cloudwatch_to_firehose_trust_iam_role_name | IAM Role name for CloudWatch to Kinesis Firehose subscription | string | `CloudWatchToSplunkFirehoseTrust` | no |
 | cloudwatch_to_fh_access_policy_name | Name of IAM policy attached to the IAM role for CloudWatch to Kinesis Firehose subscription | string | `KinesisCloudWatchToFirehosePolicy` | no |

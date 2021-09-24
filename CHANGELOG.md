@@ -1,8 +1,11 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
+## 0.5.4
+  * Adds option to passthrough memory_size for the lambda function
+
 ## 0.5.3
   * Adds fix to logprocessor regarding invalid if else statement
-  
+
 ## 0.5.2
   * Adds switch case for epic and numerical timestamps and do a transformation if needed
 

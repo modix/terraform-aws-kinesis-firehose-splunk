@@ -106,6 +106,11 @@ variable "lambda_function_timeout" {
   default     = 180
 }
 
+variable "lambda_function_memory_limit_in_mb" {
+  description = "The memory limit in MB which can be the max for a single function"
+  default     = 128
+}
+
 variable "lambda_iam_policy_name" {
   description = "Name of the IAM policy that is attached to the IAM Role for the lambda transform function"
   default     = "Kinesis-Firehose-to-Splunk-Policy"

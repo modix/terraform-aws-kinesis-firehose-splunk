@@ -223,6 +223,7 @@ resource "aws_lambda_function" "firehose_lambda_transform" {
   filename         = "${ data.archive_file.lambda_function.output_path }"
   role             = "${ aws_iam_role.kinesis_firehose_lambda.arn }"
   handler          = "${ var.kinesis_firehose_logs_processor }.handler"
+  memory_size      = "${ var.lambda_function_memory_limit_in_mb }"
   source_code_hash = "${ data.archive_file.lambda_function.output_base64sha256 }"
   runtime          = "${ var.nodejs_runtime }"
   timeout          = "${ var.lambda_function_timeout }"

@@ -1,8 +1,11 @@
 # Change Log for Terraform AWS Kinesis Firehose Splunk
 
+## 0.6.1
+  * fixes output issue
+
 ## 0.6.0
   * Adds module_count which can be used to globally activate or deactivate all resources in this module
-  
+
 ## 0.5.4
   * Adds option to passthrough memory_size for the lambda function
 
